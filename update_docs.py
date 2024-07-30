@@ -4,6 +4,7 @@ import subprocess
 
 import os
 import sys
+import time
 import pandas as pd
 
 
@@ -60,7 +61,7 @@ def generate_odt_pdf_and_html_from_odf(p, temp_dir, doc_md_path, reference_odt):
     ).communicate()
 
 
-def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output_filename):
+def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output_filename, quiet=True):
     # Generate LaTeX template
     print(doc_md_path)
     os.makedirs(f"{temp_dir}/.local/share/pandoc/templates", exist_ok=True)
@@ -83,7 +84,7 @@ def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output
     txt = open(doc_md_path).read()
     constants = {
         "title": p["Name"],
-        "author": "BMLL",
+        # "author": "BMLL",
         "date": pd.Timestamp.now().strftime("%Y-%m-%d"),
         "titlepage": True,
         "titlepage-color": "ffffff",
@@ -105,6 +106,8 @@ def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output
     # Render LaTeX to PDF using Docker
     shutil.copy(os.path.join(temp_dir, "doc.tex"), f"{output_filename}.tex")
     docker_cmd = f"docker run --rm -v {temp_dir}:/workdir  texlive/texlive:latest /bin/sh -c 'pdflatex /workdir/doc.tex;pdflatex /workdir/doc.tex' 2>&1 | tee {temp_dir}/doc.err"
+    if quiet:
+        docker_cmd += " > /dev/null"
     os.system(docker_cmd)
 
     # Copy the generated PDF to the desired location
@@ -165,8 +168,8 @@ if __name__ == "__main__":
         if docfilter not in p["Name"].lower():
             continue
         try:
-            res = get_grist_table("Schema", refq={"Tables": pi})
-
+            res = get_grist_table("Schema", query={"Tables": pi})
+            print(res[["ColumnName", "ColumnType"]])
             tname = "".join(
                 c
                 for c in p["Name"].lower().replace(" ", "_").replace("_", "-")
@@ -175,7 +178,32 @@ if __name__ == "__main__":
             print("TNAME", tname)
             if tname:
                 res.to_csv("schema.csv")
-                res = res.assign(Subtable=lambda x:x["Subtable"].fillna("999-Other")).sort_values(["Subtable", "ColumnName"]).query("~Deprecated")[
+                pkeys=p["PrimaryKeys"]
+                pakeys=p["PartitionnedBy"]
+                # pkeys = [s.strip() for s in p["PrimaryKeys"].split(",")]
+
+                res["NColumnName"] = res[("ColumnNameCamelCase" if p["PrimaryColumnStandard"]=="CamelCase" else "ColumnNameSnakeCase")].fillna(res["ColumnName"])
+                c2n = res.set_index("ColumnName")["NColumnName"].copy()
+                res["ColumnName"] = res["NColumnName"]
+                res = res.drop(columns=["NColumnName"])
+
+                pkeys = [c2n.get(col,col) for col in pkeys]
+                pakeys = [c2n.get(col,col) for col in pakeys]
+
+                p["PrimaryKeys"] = pkeys
+                p["PartitionnedBy"] = pakeys
+
+                for k in pkeys:
+                    if k not in res["ColumnName"].values:
+                        print (res["ColumnName"].values)
+                        print((f"Primary key {k} not found in schema for product "+p["Name"]))
+                        time.sleep(10)
+                        raise Exception(f"Primary key {k} not found in schema")
+
+                res=res.assign(IsNotPartitionKey=lambda x:~x["ColumnName"] .isin(pakeys))
+                res=res.assign(IsNotPrimaryKey=lambda x:~x["ColumnName"] .isin(pkeys))
+                print(res[["ColumnName", "ColumnType"]])
+                res = res.assign(Subtable=lambda x:x["Subtable"].fillna("999-Other")).sort_values(["IsNotPartitionKey", "IsNotPrimaryKey","Subtable", "ColumnName"]).query("~Deprecated")[
                     [
                         "ColumnName",
                         "ColumnType",
