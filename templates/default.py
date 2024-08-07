@@ -5,6 +5,9 @@ from docbuilder_utils import format_table, get_grist_table, solve_coverage_table
 
 
 schema_type_table = get_grist_table('Schema_types')[["Type_Name","Description","Sample"]] #.iloc[:0]
+
+print(schema_type_table)
+
 tsas = get_grist_table('TechnologySubassets')
 
 EXTRA_BLURB="""
@@ -50,11 +53,18 @@ def snake_to_human(s):
 def generate_documentation_for_table(p, table):
     column_width={"ColumnName": 28, "ColumnType": 14, "Description": 40}
     # math modes in table not supported yet
+    
     table = table.assign(ColumnName=lambda x:x['ColumnName'].apply(lambda s:f'`{s}`'))
     if len(table)>24 and len(table["Subtable"].unique())>1:
         table_schema="This table is large, for clarity, we split the columns in different groups.\n\n"
         for gn, g in table.groupby("Subtable"):
-            table_schema+=(f"### {snake_to_human(re.match('[0-9]+-(.*)',gn).group(1))} Columns\n\n")
+            try:
+                table_schema+=(f"### {snake_to_human(re.match('[0-9]+-(.*)',gn).group(1))} Columns\n\n")
+            except AttributeError:
+                if gn:
+                    table_schema+=(f"### {gn} Columns\n\n")
+                else:
+                    table_schema+=(f"### Other Columns\n\n")
             table_schema+=(format_table(g[["ColumnName","ColumnType","Description"]],  column_width=column_width))
             table_schema+="\n\n"
         
@@ -70,9 +80,18 @@ def generate_documentation_for_table(p, table):
 
 # Data Format
 
-## Row 
+## Rows and Data Partitions 
 
-A row is uniquely identified by the combination of its primary key : {', '.join(['`'+k.strip().strip('`').strip()+'`' for k in p["PrimaryKeys"].split(',') ])}.
+"""
+    if p["PartitionnedBy"]:
+        txt+=f"""
+The data is partitioned by {', '.join(['`'+k.strip().strip('`').strip()+'`' for k in p["PrimaryKeys"] ])}. Depending on the technology that you are using to access the data, you 
+will may need to specify which partition you want to access. If you specify a partition to use the columns that are explicitely specified won't be returned in the schema.
+"""
+    
+    txt+= f"""
+
+A row is uniquely identified by the combination of its primary key : {', '.join(['`'+k.strip().strip('`').strip()+'`' for k in (p["PartitionnedBy"]+p["PrimaryKeys"]) ])}.
 
 {p["Row_Definition"]}
 
@@ -120,6 +139,8 @@ This column can take one of the following values:
                                 # Technical aspects of the implementation                                
 
                                 """)
+        if not isinstance(tsa,(list, tuple)):
+            tsa=[tsa]
         for ct in tsa:
             try:
                 ctt=tsas.query("SubassetPublicName==@ct").iloc[0]
@@ -127,22 +148,26 @@ This column can take one of the following values:
                 txt+=ctt["PublicDescription"]
                 txt+="\n\n"
             except Exception as e:
-                print("Could not find {ct}: {e}")
+                print(f"Could not find {ct}: {e}")
                 
 
         
 
-    ct=solve_coverage_table(p["CoverageTable"])
+    ct=solve_coverage_table(p,"CoverageTable")
     if ct is not False:
         txt += textwrap.dedent("""
                                 
-                                # Coverage
+                               # Coverage
                                 
-                                {table}
+                               ::: vfix
+
+                               {table}
+                               
+                               :::
 
                                 """).format(table=format_table(ct))
         
-    ct=solve_coverage_table(p["LandingTimeTable"])
+    ct=solve_coverage_table(p,"LandingTimeTable")
     if ct is not False:
         txt += textwrap.dedent("""
                                 

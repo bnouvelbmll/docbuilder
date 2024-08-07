@@ -199,6 +199,21 @@ function handleTableCells(cell)
 end
 
 
+function concatenateRawBlocks(rawBlocks)
+    -- Initialize an empty string to hold the concatenated content
+    local combined_content = ""
+
+    -- Iterate through the Lua table of RawBlock elements
+    for _, rawBlock in ipairs(rawBlocks) do
+        if rawBlock.t == "RawBlock" and rawBlock.format == "latex" then
+            -- Append the text of each RawBlock to the combined_content, adding a newline for separation
+            combined_content = combined_content .. rawBlock.text .. "\n"
+        end
+    end
+
+    -- Create a new RawBlock with the concatenated content
+    return pandoc.RawBlock("latex", combined_content)
+end
 
 -- supertabular-filter.lua
 function TableSupertabular(el)
@@ -270,7 +285,8 @@ function TableSupertabular(el)
     local header_content = processTableHeaders(el.headers)
     -- Start constructing the table with supertabular environment
     local latex_table = {
-        pandoc.RawBlock("latex", "\\vspace{-0.1cm}"), -- fix v overflow
+        pandoc.RawBlock("latex", "\\nobreak"), -- fix v overflow
+        -- pandoc.RawBlock("latex", "\\begin{minipage}{\\textwidth}"), -- fix v overflow
         pandoc.RawBlock("latex", "\\begin{small}"),
         pandoc.RawBlock("latex", "\\tablefirsthead{\\hline \\rowcolor{headercolor1}  " .. header_content .. " \\\\ \\hline}"), -- tableHeaders
         pandoc.RawBlock("latex", "\\tablehead{\\hline \\rowcolor{headercolor2} \\multicolumn{" .. num_cols .. "}{|c|}{\\small\\slshape continued from previous page} \\\\ \\hline \\rowcolor{headercolor1}" .. header_content .. " \\\\ \\hline}"),
@@ -326,9 +342,10 @@ function TableSupertabular(el)
     -- Close the supertabular environment
     table.insert(latex_table, pandoc.RawBlock("latex", "\\end{supertabular}"))
     table.insert(latex_table, pandoc.RawBlock("latex", "\\end{small}"))
+    -- table.insert(latex_table, pandoc.RawBlock("latex", "\\end{minipage}"))
 
     -- Replace the original table element with the new RawBlock elements
-    return latex_table
+    return concatenateRawBlocks(latex_table)
 end
 
 -- Function to convert headers to a LaTeX row
