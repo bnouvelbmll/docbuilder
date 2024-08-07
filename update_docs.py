@@ -104,9 +104,13 @@ def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output
     # os.system(f"cat  {os.path.join(temp_dir, 'doc.tex')}")
     # Render LaTeX to PDF using Docker
     shutil.copy(os.path.join(temp_dir, "doc.tex"), f"{output_filename}.tex")
-    docker_cmd = f"docker run --rm -v {temp_dir}:/workdir  texlive/texlive:latest /bin/sh -c 'pdflatex /workdir/doc.tex;pdflatex /workdir/doc.tex' 2>&1 | tee {temp_dir}/doc.err"
-    os.system(docker_cmd)
-
+    if os.environ.get("HOME")!='/home/bmll':
+        docker_cmd = f"docker run --rm -v {temp_dir}:/workdir  texlive/texlive:latest /bin/sh -c 'pdflatex /workdir/doc.tex;pdflatex /workdir/doc.tex' 2>&1 | tee {temp_dir}/doc.err"
+        os.system(docker_cmd)
+    else:
+        cmd =  f"cd {temp_dir};(pdflatex /workdir/doc.tex;pdflatex /workdir/doc.tex) 2>&1 | tee {temp_dir}/doc.err"
+        os.system(cmd)
+        
     # Copy the generated PDF to the desired location
     shutil.copy(os.path.join(temp_dir, "doc.pdf"), f"{output_filename}.pdf")
     shutil.copy(os.path.join(temp_dir, "doc.log"), f"{output_filename}.log")
