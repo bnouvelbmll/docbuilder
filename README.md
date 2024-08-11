@@ -10,8 +10,13 @@ For this is is sufficient to clone the repo and to run the adequate processes.
 ```
 cd user; git clone git@github.com:bnouvelbmll/docbuilder.git
 
-echo -e '#!/bin/bash\nexec TEXMFHOME=~/local/usr/share/texlive/texmf-dist/ LD_LIBRARY_PATH=~/local/usr/lib/x86_64-linux-gnu/ ~/local/usr/bin/latex' &> ~/bin/pdflatex
+echo -e '#!/bin/bash\nTEXMFHOME=~/local/usr/share/texlive/texmf-dist/ LD_LIBRARY_PATH=~/local/usr/lib/x86_64-linux-gnu/ exec ~/local/usr/bin/pdflatex $*' &> ~/bin/pdflatex
 chmod +x ~/bin/pdflatex
 
-python update_docs
+
+source activate $STABLE_VENV
+pip install diskcache
+
+
+BMLL_GRIST_TOKEN='yourtoken' python update_docs
 ```
