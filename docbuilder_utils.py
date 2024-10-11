@@ -11,6 +11,8 @@ import diskcache
 
 import json
 from bcdf.utils.dataquery_utils import apply_pandas_filters
+from bcdf import settings
+from bcdf import secrets
 
 GRIST_CACHE_DIR = ".grist_cache"
 grist_cache = diskcache.Cache(
@@ -18,7 +20,7 @@ grist_cache = diskcache.Cache(
 )
 
 GRIST_URL = "https://bmlltech.getgrist.com/"
-APIKEY = os.environ.get("BMLL_GRIST_TOKEN")
+APIKEY = os.environ.get("BMLL_GRIST_TOKEN", secrets.get_secret(settings.BMLL_ENV_NAME, "BMLL_GRIST_TOKEN"))
 GRIST_DOCID = "n1kWpf68Saqo"
 TABLEID = "Constants"
 
