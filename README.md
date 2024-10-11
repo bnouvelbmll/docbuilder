@@ -8,15 +8,42 @@ For simplicity, the documentation generation process can be runned on the lab.
 For this is is sufficient to clone the repo and to run the adequate processes.
 
 ```
-cd user; git clone git@github.com:bnouvelbmll/docbuilder.git
-
-echo -e '#!/bin/bash\nTEXMFHOME=~/local/usr/share/texlive/texmf-dist/ LD_LIBRARY_PATH=~/local/usr/lib/x86_64-linux-gnu/ exec ~/local/usr/bin/pdflatex $*' &> ~/bin/pdflatex
-chmod +x ~/bin/pdflatex
-
-
 source activate $STABLE_VENV
-pip install diskcache
 
+# INSTALL BCDF AND DOCBUILDER
+cd user; git clone git@github.com:bnouvelbmll/bcdf.git
+(cd bcdf;  pip install -r requirements.txt ; pip install -e .)
+cd user; git clone git@github.com:bnouvelbmll/docbuilder.git
+(cd docbuilder; pip install -r requirements.txt)
 
-BMLL_GRIST_TOKEN='yourtoken' python update_docs
+# INSTALL PANDOC AND LATEX
+bcdf _system dpkg pandoc
+ln -s ~/local/usr/share/pandoc ~/.pandoc
+echo -e '#!/bin/bash\nLD_LIBRARY_PATH=~/local/usr/lib/x86_64-linux-gnu  ~/local/usr/bin/pandoc  --abbreviations=$HOME/.pandoc/data/abbreviations $*' > ~/bin/pandoc
+chmod +x ~/bin/pandoc
+(cd /;tar -xvzf ~/organisation/bertrand/tex.tgz )# generated from  https://tug.org/texlive/quickinstall.html
+
+# ENSURE BINARIES AND SCRIPTS ARE IN PATH
+export PATH=/tmp/tex/bin/x86_64-linux:$HOME/bin:$PATH
+
+# BUILD THE DOCUMENTATION
+python update_docs.py
+```
+
+NOTE: The docbuilder requires access to grist and to snowflake...
+We will get adequate read-only tokens for the lab.
+This will allow us to run this as scheduled task.
+
+On clusters, texlive can run via docker and apt-get install can be used for pandoc,
+bcdf contains the logic for automating running scripts that are in the repo.
+
+It is not yet finalised but ultimately it should be a case of doing:
+```
+bcdf ./update_docs.py job install 
+```
+
+To set credentials, you can use the following:
+```
+bcdf secrets set BMLL_GTHUB_TOKEN <token>
+bcdf secrets set BMLL_SNOWFLAKE_CREDENTIAL <token>
 ```
