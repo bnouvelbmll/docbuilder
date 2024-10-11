@@ -133,7 +133,7 @@ This column can take one of the following values:
 	)
 
     tsa=p["TechnologySubAssets"]
-    if len(tsa) is not False:
+    if tsa is not None and len(tsa):
         txt += textwrap.dedent("""
                                 
                                 # Technical aspects of the implementation                                
