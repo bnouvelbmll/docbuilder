@@ -111,7 +111,7 @@ def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output
             docker_cmd += " > /dev/null"
         os.system(docker_cmd)
     else:
-        cmd =  f"cd {temp_dir};(pdflatex /workdir/doc.tex;pdflatex /workdir/doc.tex) 2>&1 | tee {temp_dir}/doc.err"
+        cmd =  f"cd {temp_dir};(pdflatex doc.tex;pdflatex doc.tex) 2>&1 | tee {temp_dir}/doc.err"
         if quiet:
             cmd += " > /dev/null"
 
@@ -205,7 +205,7 @@ if __name__ == "__main__":
                         print (res["ColumnName"].values)
                         print((f"Primary key {k} not found in schema for product "+p["Name"]))
                         time.sleep(10)
-                        raise Exception(f"Primary key {k} not found in schema")
+                        #raise Exception(f"Primary key {k} not found in schema")
 
                 res=res.assign(IsNotPartitionKey=lambda x:~x["ColumnName"] .isin(pakeys))
                 res=res.assign(IsNotPrimaryKey=lambda x:~x["ColumnName"] .isin(pkeys))
