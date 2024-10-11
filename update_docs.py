@@ -190,6 +190,8 @@ if __name__ == "__main__":
                 # pkeys = [s.strip() for s in p["PrimaryKeys"].split(",")]
 
                 res["NColumnName"] = res[("ColumnNameCamelCase" if p["PrimaryColumnStandard"]=="CamelCase" else "ColumnNameSnakeCase")].fillna(res["ColumnName"])
+                if p["PrimaryColumnStandard"]=="UPPER_CASE":
+                    res["NColumnName"] = res["NColumnName"].str.upper()
                 c2n = res.set_index("ColumnName")["NColumnName"].copy()
                 res["ColumnName"] = res["NColumnName"]
                 res = res.drop(columns=["NColumnName"])
