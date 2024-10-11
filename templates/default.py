@@ -54,7 +54,7 @@ def generate_documentation_for_table(p, table):
     column_width={"ColumnName": 28, "ColumnType": 14, "Description": 40}
     # math modes in table not supported yet
     
-    table = table.assign(ColumnName=lambda x:x['ColumnName'].apply(lambda s:f'`{s}`'))
+    table = table.assign(ColumnName=lambda x:x['ColumnName'].apply(lambda s:f'`{s}`')).query("~Reserved")
     if len(table)>24 and len(table["Subtable"].unique())>1:
         table_schema="This table is large, for clarity, we split the columns in different groups.\n\n"
         for gn, g in table.groupby("Subtable"):
