@@ -1,0 +1,7 @@
+snowflake
+tabulate
+python-docx
+odfpy
+diskcache
+BeautifulSoup4
+google-auth
