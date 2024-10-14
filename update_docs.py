@@ -6,7 +6,7 @@ import os
 import sys
 import time
 import pandas as pd
-
+import shutil
 
 import yaml
 
@@ -14,6 +14,15 @@ import yaml
 from docbuilder_utils import get_grist_table, wrap_links_in_markdown
 
 from templates.default import generate_documentation_for_table
+
+
+
+if not os.path.exists("/usr/share/pandoc/data/templates/bmll_template.latex"):
+    if not os.path.exists(os.path.expanduser("~/local/usr/share/pandoc/data/")):
+       os.makedirs(os.path.expanduser("~/local/usr/share/pandoc/data/"))
+       shutil("template.tex", "~/local/usr/share/pandoc/data/bmll_template.latex")
+    os.environ["PANDOC_DATA_DIR"]=os.path.expanduser("~/local/usr/share/pandoc/data/")
+
 
 
 def generate_md(p, table, temp_dir):
@@ -61,7 +70,7 @@ def generate_odt_pdf_and_html_from_odf(p, temp_dir, doc_md_path, reference_odt):
     ).communicate()
 
 
-def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output_filename, quiet=True):
+def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output_filename, quiet=False):
     # Generate LaTeX template
     print(doc_md_path)
     os.makedirs(f"{temp_dir}/.local/share/pandoc/templates", exist_ok=True)
@@ -116,7 +125,7 @@ def generate_pdf_html_from_latex(p, temp_dir, doc_md_path, reference_tex, output
             cmd += " > /dev/null"
 
         os.system(cmd)
-        
+
     # Copy the generated PDF to the desired location
     shutil.copy(os.path.join(temp_dir, "doc.pdf"), f"{output_filename}.pdf")
     shutil.copy(os.path.join(temp_dir, "doc.log"), f"{output_filename}.log")
