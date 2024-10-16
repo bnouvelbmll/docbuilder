@@ -387,12 +387,18 @@ def process_choicelist_columns(table_data, columns):
     return table_data
 
 def process_date_columns(table_data, columns):
-    date_cols = columns[columns["type"].str.startswith("Date")]
-    for i, c in date_cols.iterrows():
-        table_data[i] = pd.to_datetime(table_data[i] * 10**9)
-    fdate_cols = columns[columns["type"].str.startswith("Any")]
-    for i, c in fdate_cols.iterrows():
-        table_data[i] = table_data[i].map(lambda x:(pd.to_datetime(x[1]* 10**9) if x is not None and isinstance(x, (list, tuple)) and x[0]=='d' else x) )
+    lc=None
+    try:
+        date_cols = columns[columns["type"].str.startswith("Date")]
+        for i, c in date_cols.iterrows():
+            lc = c
+            table_data[i] = pd.to_datetime(table_data[i] * 10**9)
+        fdate_cols = columns[columns["type"].str.startswith("Any")]
+        for i, c in fdate_cols.iterrows():
+            lc = c
+            table_data[i] = table_data[i].map(lambda x:(pd.to_datetime(x[1]* 10**9) if x is not None and isinstance(x, (list, tuple)) and x[0]=='d' else x) )
+    except Exception as e:
+        print("Error whil processing date column",lc,e)
 
     return table_data
 
