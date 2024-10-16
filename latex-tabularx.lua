@@ -367,7 +367,7 @@ end
 local latexCmds = pandoc.List:new {'alert', 'code', 'autosize'}
 
 -- LaTeX environments to be handled (matching definitions needed!)
-local latexEnvs = pandoc.List:new { 'center', 'vfix', 'landscape', 'xlandscape'}
+local latexEnvs = pandoc.List:new { 'center', 'vfix', 'landscape', 'xlandscape', 'internaldocs'}
 
 -- handle selected Spans: embed content into a RawInline with matching LaTeX command
 function Span(el)

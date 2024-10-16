@@ -10,6 +10,8 @@ print(schema_type_table)
 
 tsas = get_grist_table('TechnologySubassets')
 
+INTERNAL_SPECS=True
+
 EXTRA_BLURB="""
 # Data Quality
 
@@ -54,6 +56,7 @@ def generate_documentation_for_table(p, table):
     column_width={"ColumnName": 28, "ColumnType": 14, "Description": 40}
     # math modes in table not supported yet
     
+    reserved_table = table.assign(ColumnName=lambda x:x['ColumnName'].apply(lambda s:f'`{s}`')).query("Reserved")
     table = table.assign(ColumnName=lambda x:x['ColumnName'].apply(lambda s:f'`{s}`')).query("~Reserved")
     if len(table)>24 and len(table["Subtable"].unique())>1:
         table_schema="This table is large, for clarity, we split the columns in different groups.\n\n"
@@ -70,6 +73,13 @@ def generate_documentation_for_table(p, table):
         
     else:        
         table_schema = format_table(table[["ColumnName","ColumnType","Description"]],  column_width=column_width)
+
+
+
+    if INTERNAL_SPECS:
+        reserved_table_schema = """### Reserved fields\n\n"""
+        reserved_table_schema+= format_table(reserved_table[["ColumnName","ColumnType","Description"]],  column_width=column_width)
+
 
     #table_schema=":::: landscape\n\n"+table_schema+"\n\n::::"
      
@@ -103,6 +113,13 @@ A row is uniquely identified by the combination of its primary key : {', '.join(
 {
     table_schema
 }
+
+
+
+{
+    reserved_table_schema
+}
+
 
 ## Data Types
 
