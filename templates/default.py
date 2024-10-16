@@ -4,15 +4,17 @@ import pandas as pd
 from docbuilder_utils import format_table, get_grist_table, solve_coverage_table
 
 
-schema_type_table = get_grist_table('Schema_types')[["Type_Name","Description","Sample"]] #.iloc[:0]
+schema_type_table = get_grist_table("Schema_types")[
+    ["Type_Name", "Description", "Sample"]
+]  # .iloc[:0]
 
 print(schema_type_table)
 
-tsas = get_grist_table('TechnologySubassets')
+tsas = get_grist_table("TechnologySubassets")
 
-INTERNAL_SPECS=True
+INTERNAL_SPECS = True
 
-EXTRA_BLURB="""
+EXTRA_BLURB = """
 # Data Quality
 
 ## General policies
@@ -49,41 +51,55 @@ if you have questions about known issues on this data.
 If you have identified a new issue, please report it to our team at support@bmlltech.com.
 """
 
+
 def snake_to_human(s):
-    return ' '.join(word.capitalize() for word in s.lower().replace('_', ' ').split())
+    return " ".join(word.capitalize() for word in s.lower().replace("_", " ").split())
+
 
 def generate_documentation_for_table(p, table):
-    column_width={"ColumnName": 28, "ColumnType": 14, "Description": 40}
+    column_width = {"ColumnName": 28, "ColumnType": 14, "Description": 40}
     # math modes in table not supported yet
-    
-    reserved_table = table.assign(ColumnName=lambda x:x['ColumnName'].apply(lambda s:f'`{s}`')).query("Reserved")
-    table = table.assign(ColumnName=lambda x:x['ColumnName'].apply(lambda s:f'`{s}`')).query("~Reserved")
-    if len(table)>24 and len(table["Subtable"].unique())>1:
-        table_schema="This table is large, for clarity, we split the columns in different groups.\n\n"
+
+    reserved_table = table.assign(
+        ColumnName=lambda x: x["ColumnName"].apply(lambda s: f"`{s}`")
+    ).query("Reserved")
+    table = table.assign(
+        ColumnName=lambda x: x["ColumnName"].apply(lambda s: f"`{s}`")
+    ).query("~Reserved")
+    if len(table) > 24 and len(table["Subtable"].unique()) > 1:
+        table_schema = "This table is large, for clarity, we split the columns in different groups.\n\n"
         for gn, g in table.groupby("Subtable"):
             try:
-                table_schema+=(f"### {snake_to_human(re.match('[0-9]+-(.*)',gn).group(1))} Columns\n\n")
+                table_schema += f"### {snake_to_human(re.match('[0-9]+-(.*)',gn).group(1))} Columns\n\n"
             except AttributeError:
                 if gn:
-                    table_schema+=(f"### {gn} Columns\n\n")
+                    table_schema += f"### {gn} Columns\n\n"
                 else:
-                    table_schema+=(f"### Other Columns\n\n")
-            table_schema+=(format_table(g[["ColumnName","ColumnType","Description"]],  column_width=column_width))
-            table_schema+="\n\n"
-        
-    else:        
-        table_schema = format_table(table[["ColumnName","ColumnType","Description"]],  column_width=column_width)
+                    table_schema += f"### Other Columns\n\n"
+            table_schema += format_table(
+                g[["ColumnName", "ColumnType", "Description"]],
+                column_width=column_width,
+            )
+            table_schema += "\n\n"
 
-
+    else:
+        table_schema = format_table(
+            table[["ColumnName", "ColumnType", "Description"]],
+            column_width=column_width,
+        )
 
     if INTERNAL_SPECS:
         reserved_table_schema = """### Reserved fields\n\n"""
-        reserved_table_schema+= format_table(reserved_table[["ColumnName","ColumnType","Description"]],  column_width=column_width)
+        reserved_table_schema += """::::internaldocs\n"""
+        reserved_table_schema += format_table(
+            reserved_table[["ColumnName", "ColumnType", "Description"]],
+            column_width=column_width,
+        )
+        reserved_table_schema += "::::\n"
 
+    # table_schema=":::: landscape\n\n"+table_schema+"\n\n::::"
 
-    #table_schema=":::: landscape\n\n"+table_schema+"\n\n::::"
-     
-    txt=f"""
+    txt = f"""
 # Introduction
 
 {p["DocumentationIntro"]}
@@ -94,12 +110,12 @@ def generate_documentation_for_table(p, table):
 
 """
     if p["PartitionnedBy"]:
-        txt+=f"""
+        txt += f"""
 The data is partitioned by {', '.join(['`'+k.strip().strip('`').strip()+'`' for k in p["PrimaryKeys"] ])}. Depending on the technology that you are using to access the data, you 
 will may need to specify which partition you want to access. If you specify a partition to use the columns that are explicitely specified won't be returned in the schema.
 """
-    
-    txt+= f"""
+
+    txt += f"""
 
 A row is uniquely identified by the combination of its primary key : {', '.join(['`'+k.strip().strip('`').strip()+'`' for k in (p["PartitionnedBy"]+p["PrimaryKeys"]) ])}.
 
@@ -128,16 +144,20 @@ A row is uniquely identified by the combination of its primary key : {', '.join(
 }
 
 """
-    txt=textwrap.dedent(txt)
-    if len(table[table["EnumValues"].apply(len)>0]):
-        txt+=textwrap.dedent("""## Values used in enumerations""")
-    for r,v in table[table["EnumValues"].apply(len)>0].iterrows():    
+    txt = textwrap.dedent(txt)
+    if len(table[table["EnumValues"].apply(len) > 0]):
+        txt += textwrap.dedent("""## Values used in enumerations""")
+    for r, v in table[table["EnumValues"].apply(len) > 0].iterrows():
         ev = pd.DataFrame(
-            [ (ccv.split(":")[0], ":".join(ccv.split(":")[1:]))  for ccv in v["EnumValues"].split("\n") if len(ccv.strip()) and ":" in ccv],
-            columns=["Name", "Description"]
-            )
-        txt+=textwrap.dedent(
-	 f"""
+            [
+                (ccv.split(":")[0], ":".join(ccv.split(":")[1:]))
+                for ccv in v["EnumValues"].split("\n")
+                if len(ccv.strip()) and ":" in ccv
+            ],
+            columns=["Name", "Description"],
+        )
+        txt += textwrap.dedent(
+            f"""
 
 ### {v["ColumnName"].strip('`')}
 
@@ -147,32 +167,32 @@ This column can take one of the following values:
 
 { format_table(ev) }
 	 """
-	)
+        )
 
-    tsa=p["TechnologySubAssets"]
+    tsa = p["TechnologySubAssets"]
     if tsa is not None and len(tsa):
-        txt += textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
                                 
                                 # Technical aspects of the implementation                                
 
-                                """)
-        if not isinstance(tsa,(list, tuple)):
-            tsa=[tsa]
+                                """
+        )
+        if not isinstance(tsa, (list, tuple)):
+            tsa = [tsa]
         for ct in tsa:
             try:
-                ctt=tsas.query("SubassetPublicName==@ct").iloc[0]
-                txt+=f"## {ct}\n\n"
-                txt+=ctt["PublicDescription"]
-                txt+="\n\n"
+                ctt = tsas.query("SubassetPublicName==@ct").iloc[0]
+                txt += f"## {ct}\n\n"
+                txt += ctt["PublicDescription"]
+                txt += "\n\n"
             except Exception as e:
                 print(f"Could not find {ct}: {e}")
-                
 
-        
-
-    ct=solve_coverage_table(p,"CoverageTable")
+    ct = solve_coverage_table(p, "CoverageTable")
     if ct is not False:
-        txt += textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
                                 
                                # Coverage
                                 
@@ -182,11 +202,13 @@ This column can take one of the following values:
                                
                                :::
 
-                                """).format(table=format_table(ct))
-        
-    ct=solve_coverage_table(p,"LandingTimeTable")
+                                """
+        ).format(table=format_table(ct))
+
+    ct = solve_coverage_table(p, "LandingTimeTable")
     if ct is not False:
-        txt += textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
                                 
                                 # Landing Times
                                 
@@ -196,32 +218,37 @@ This column can take one of the following values:
                                 
                                 :::
 
-                                """).format(table=format_table(ct))
+                                """
+        ).format(table=format_table(ct))
 
-    txt+=textwrap.dedent("""
+    txt += textwrap.dedent(
+        """
     # Delivery Mechanisms
                              
-    """)
-
+    """
+    )
 
     if "API" in p["DeliveryMechanism"]:
-        txt+=textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
     ## BMLL DataFeed API
                              
     BMLL provides an API to access this data. Please consult https://data.bmlltech.com/ for more information about the API.
     """
-    )    
-        
+        )
+
     if "Lab" in p["DeliveryMechanism"]:
-        txt+=textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
     ## BMLL Data Lab
                              
     This data is directly available in the BMLL Data Lab.                             
     """
-    )
+        )
 
     if "Snowflake" in p["DeliveryMechanism"]:
-        txt+=textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
     ## BMLL Data on Snowflake 
                              
     This data is available via Snowflake.
@@ -230,10 +257,11 @@ This column can take one of the following values:
     
     The sample dataset is accessible on [Snowflake marketplace](https://app.snowflake.com/marketplace/providers/GZTSZC7NYY4/BMLL%20Technologies?categorySecondary=%5B%227%22%5D&originTab=providers).
     """
-    )
-                
+        )
+
     if True or "Revolate" in p["DeliveryMechanism"]:
-        txt+=textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
     ## SFTP, custom deliveries format and samples
 
     There are many alternative possible formats that we can deliver, if you have custom needs, or would like
@@ -243,27 +271,28 @@ This column can take one of the following values:
     
                              
     """
-    )        
-
+        )
 
     if "S3" in p["DeliveryMechanism"]:
-        txt+=textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
     ## BMLL S3 Partner Connenections
                              
     The data is accessible via shared S3 buckets to BMLL partners.
     """
         )
-    txt+=EXTRA_BLURB
+    txt += EXTRA_BLURB
 
     if "DocumentationNotes" in p and p["DocumentationNotes"]:
-        txt+=textwrap.dedent("""
+        txt += textwrap.dedent(
+            """
         # Notes
-        """)
+        """
+        )
 
-        txt+=p["DocumentationNotes"]
+        txt += p["DocumentationNotes"]
 
     if "ExtraDocs" in p and p["ExtraDocs"]:
-        txt+=p["ExtraDocs"]
-     
-    
+        txt += p["ExtraDocs"]
+
     return txt
