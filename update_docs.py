@@ -235,8 +235,8 @@ if __name__ == "__main__":
                 ]
                 res["ColumnType"] = (
                     res["ColumnType"].astype(str)
-                    + res["PrimaryKey"].map({True: " [pk]{pill}", False: ""})
-                    + res["Optional"].map({True: " [opt]{pill}", False: ""})
+                    + res["PrimaryKey"].map({True: " [pk]{.pill} ", False: ""})
+                    + res["Optional"].map({True: " [opt]{.pill} ", False: ""})
                 )
                 res = res.drop(["PrimaryKey", "Optional"], axis=1)
 
