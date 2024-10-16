@@ -111,7 +111,7 @@ def generate_documentation_for_table(p, table):
 """
     if p["PartitionnedBy"]:
         txt += f"""
-The data is partitioned by {', '.join(['`'+k.strip().strip('`').strip()+'`' for k in p["PrimaryKeys"] ])}. Depending on the technology that you are using to access the data, you 
+The data is partitioned by {', '.join(['`'+k.strip().strip('`').strip()+'`' for k in p["PartitionnedBy"] ])}. Depending on the technology that you are using to access the data, you 
 will may need to specify which partition you want to access. If you specify a partition to use the columns that are explicitely specified won't be returned in the schema.
 """
 
