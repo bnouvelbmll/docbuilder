@@ -289,7 +289,7 @@ This column can take one of the following values:
         )
     txt += EXTRA_BLURB
 
-    if pmonitoring:
+    if pmonitoring is not None and len(pmonitoring):
         txt += textwrap.dedent(
             """
     ## Monitoring
@@ -298,7 +298,7 @@ This column can take one of the following values:
     )
         txt+=format_table(pmonitoring)
 
-    if passertions:
+    if passertions is not None and len(passertions):
         txt += textwrap.dedent(
             """
     ## Data Quality Assertions
