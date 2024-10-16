@@ -271,10 +271,10 @@ This column can take one of the following values:
     if True or "Revolate" in p["DeliveryMechanism"]:
         txt += textwrap.dedent(
             """
-    ## SFTP, custom deliveries format and samples
+    ## Custom deliveries format and samples
 
-    There are many alternative possible formats that we can deliver, if you have custom needs, or would like
-    to confirm with solution is the most suited for your needs, please contact our sales team:
+    There are many mechanisms through which that we can deliver data, if you have custom needs, or would like
+    to confirm with solution is the most suited for your needs, please contact our sales team.
     We will help you to get access BMLL data in the format most suited with your needs.
     Contact sales@bmlltech.com for more information.
     
@@ -307,7 +307,7 @@ This column can take one of the following values:
 
     """
     )
-        txt+=format_table(pmonitoring)
+        txt+=format_table(pmonitoring[["MetricName","Query","GroupBy"]])
 
         txt += textwrap.dedent("""
 
