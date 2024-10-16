@@ -364,7 +364,7 @@ end
 
 
 -- LaTeX commands to be handled (matching definitions needed!)
-local latexCmds = pandoc.List:new {'alert', 'code', 'autosize'}
+local latexCmds = pandoc.List:new {'alert', 'code', 'autosize', 'pill'}
 
 -- LaTeX environments to be handled (matching definitions needed!)
 local latexEnvs = pandoc.List:new { 'center', 'vfix', 'landscape', 'xlandscape', 'internaldocs'}
