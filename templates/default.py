@@ -11,6 +11,8 @@ schema_type_table = get_grist_table("Schema_types")[
 print(schema_type_table)
 
 tsas = get_grist_table("TechnologySubassets")
+monitoring = get_grist_table("MonitoringMetrics")
+assertions = get_grist_table("Assertions")
 
 INTERNAL_SPECS = True
 
@@ -59,6 +61,10 @@ def snake_to_human(s):
 def generate_documentation_for_table(p, table):
     column_width = {"ColumnName": 28, "ColumnType": 14, "Description": 40}
     # math modes in table not supported yet
+
+    product_name=p["Name"]
+    pmonitoring = monitoring.query("Dataset == @product_name")
+    passertions = assertions.query("Dataset == @product_name")
 
     reserved_table = table.assign(
         ColumnName=lambda x: x["ColumnName"].apply(lambda s: f"`{s}`")
@@ -282,6 +288,24 @@ This column can take one of the following values:
     """
         )
     txt += EXTRA_BLURB
+
+    if pmonitoring:
+        txt += textwrap.dedent(
+            """
+    ## Monitoring
+    The following monitoring is available for this data.
+    """
+    )
+        txt+=format_table(pmonitoring)
+
+    if passertions:
+        txt += textwrap.dedent(
+            """
+    ## Data Quality Assertions
+    The following assertions are available for this data.
+    """
+        )
+        txt += format_table(passertions)
 
     if p["InternalNotes"]:
         txt += textwrap.dedent(
