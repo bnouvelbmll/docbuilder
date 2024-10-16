@@ -324,7 +324,7 @@ This column can take one of the following values:
 
     """
         )
-        txt += format_table(passertions)
+        txt += format_table(passertions.query("~Disabled")[["MetricName","Implies","Conditions","GroupBy"]])
 
         txt += textwrap.dedent("""
 
@@ -338,7 +338,8 @@ This column can take one of the following values:
             """
         ### Internal Notes
 
-        ::: Internal Notes
+        ::: internaldocs
+
         """
         )
         txt += p["InternalNotes"]
