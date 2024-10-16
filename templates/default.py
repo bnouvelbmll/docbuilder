@@ -94,6 +94,7 @@ def generate_documentation_for_table(p, table):
             column_width=column_width,
         )
 
+    reserved_table_schema = ""
     if INTERNAL_SPECS:
         if reserved_table is not None and not len(reserved_table):
             reserved_table_schema = """### Reserved fields\n\n"""
@@ -103,6 +104,7 @@ def generate_documentation_for_table(p, table):
                 column_width=column_width,
             )
             reserved_table_schema += "\n\n::::\n"
+    
 
     # table_schema=":::: landscape\n\n"+table_schema+"\n\n::::"
 
