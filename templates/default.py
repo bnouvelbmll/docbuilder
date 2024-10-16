@@ -283,6 +283,17 @@ This column can take one of the following values:
         )
     txt += EXTRA_BLURB
 
+    if p["InternalNotes"]:
+        txt += textwrap.dedent(
+            """
+        ### Internal Notes
+
+        ::: Internal Notes
+        """
+        )
+        txt += p["InternalNotes"]
+        txt += "\n:::\n\n"
+
     if "DocumentationNotes" in p and p["DocumentationNotes"]:
         txt += textwrap.dedent(
             """
