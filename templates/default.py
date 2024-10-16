@@ -95,13 +95,14 @@ def generate_documentation_for_table(p, table):
         )
 
     if INTERNAL_SPECS:
-        reserved_table_schema = """### Reserved fields\n\n"""
-        reserved_table_schema += """::::internaldocs\n\n"""
-        reserved_table_schema += format_table(
-            reserved_table[["ColumnName", "ColumnType", "Description"]],
-            column_width=column_width,
-        )
-        reserved_table_schema += "\n\n::::\n"
+        if reserved_table is not None and not len(reserved_table):
+            reserved_table_schema = """### Reserved fields\n\n"""
+            reserved_table_schema += """::::internaldocs\n\n"""
+            reserved_table_schema += format_table(
+                reserved_table[["ColumnName", "ColumnType", "Description"]],
+                column_width=column_width,
+            )
+            reserved_table_schema += "\n\n::::\n"
 
     # table_schema=":::: landscape\n\n"+table_schema+"\n\n::::"
 
