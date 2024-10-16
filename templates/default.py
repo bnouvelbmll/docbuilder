@@ -282,30 +282,56 @@ This column can take one of the following values:
     if "S3" in p["DeliveryMechanism"]:
         txt += textwrap.dedent(
             """
+
     ## BMLL S3 Partner Connenections
                              
     The data is accessible via shared S3 buckets to BMLL partners.
+
     """
         )
     txt += EXTRA_BLURB
 
+
     if pmonitoring is not None and len(pmonitoring):
         txt += textwrap.dedent(
             """
+            
     ## Monitoring
+
+    ::: internaldocs
+
     The following monitoring is available for this data.
+
     """
     )
         txt+=format_table(pmonitoring)
+
+        txt += textwrap.dedent("""
+
+        :::
+                               
+        """
+        )
 
     if passertions is not None and len(passertions):
         txt += textwrap.dedent(
             """
     ## Data Quality Assertions
+    
     The following assertions are available for this data.
+
+    ::: internaldocs
+
     """
         )
         txt += format_table(passertions)
+
+        txt += textwrap.dedent("""
+
+        :::
+                               
+        """
+        )
 
     if p["InternalNotes"]:
         txt += textwrap.dedent(
