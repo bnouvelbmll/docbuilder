@@ -95,7 +95,7 @@ def generate_documentation_for_table(p, table):
             reserved_table[["ColumnName", "ColumnType", "Description"]],
             column_width=column_width,
         )
-        reserved_table_schema += "::::\n"
+        reserved_table_schema += "\n::::\n"
 
     # table_schema=":::: landscape\n\n"+table_schema+"\n\n::::"
 
