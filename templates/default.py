@@ -115,7 +115,7 @@ def generate_documentation_for_table(p, table):
             )
             table_schema += "\n\n"
             if INTERNAL_SPECS:
-                for i in range(len(g))):
+                for i in range(len(g)):
                     if g.iloc[i]["Notes"]:
                         footnote=table.iloc[i]["Notes"].replace("\n", " ")   
                         table_schema+=f"""\n\n[NOTE ON + {g.iloc[i]["ColumnName"]}]{{.pill}} \n"""
