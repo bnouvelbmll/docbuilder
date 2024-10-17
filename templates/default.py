@@ -145,7 +145,7 @@ def generate_documentation_for_table(p, table):
 
     reserved_table_schema = ""
     if INTERNAL_SPECS:
-        if reserved_table is not None and not len(reserved_table):
+        if reserved_table is not None and len(reserved_table):
             reserved_table_schema = """### Reserved fields\n\n"""
             reserved_table_schema += """::::internaldocs\n\n"""
             reserved_table_schema += format_table(
@@ -204,11 +204,14 @@ A row is uniquely identified by the combination of its primary key : {', '.join(
 }
 
 
+::: internaldocs
+
+#### Reserved columns
 
 {
     reserved_table_schema
 }
-
+:::
 
 
 ## Data Types
