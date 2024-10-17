@@ -70,19 +70,19 @@ def generate_documentation_for_table(p, table):
     pspecifications = specifications.query("Dataset == @product_name")
     footnotes=""
 
-    if INTERNAL_SPECS:
-        ndesc= []
-        for i in range(len(table)):
-            if table.iloc[i]["Notes"]:
-                # ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [^col{table.iloc[i]["ColumnName"]}]""")
-                # footnotes+=f"""\n[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")   
+    # if INTERNAL_SPECS:
+    #     ndesc= []
+    #     for i in range(len(table)):
+    #         if table.iloc[i]["Notes"]:
+    #             # ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [^col{table.iloc[i]["ColumnName"]}]""")
+    #             # footnotes+=f"""\n[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")   
 
-                footnote=table.iloc[i]["Notes"].replace("\n", " ")   
-                ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [{footnote}]{{.xfinternalnote}}""")
+    #             footnote=table.iloc[i]["Notes"].replace("\n", " ")   
+    #             ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [{footnote}]{{.xfinternalnote}}""")
 
-            else:
-                ndesc.append(table.iloc[i]["Description"])
-        table["Description"]=pd.Series(ndesc, index=table.index)
+    #         else:
+    #             ndesc.append(table.iloc[i]["Description"])
+    #     table["Description"]=pd.Series(ndesc, index=table.index)
 
 
     reserved_table = table.assign(
@@ -114,12 +114,32 @@ def generate_documentation_for_table(p, table):
                 column_width=column_width,
             )
             table_schema += "\n\n"
+            if INTERNAL_SPECS:
+                for i in range(len(g))):
+                    if g.iloc[i]["Notes"]:
+                        footnote=table.iloc[i]["Notes"].replace("\n", " ")   
+                        table_schema+=f"""\n\n[NOTE ON + {g.iloc[i]["ColumnName"]}]{{.pill}} \n"""
+                        table_schema+=""":::: xfinternalnoteblock\n"""
+                        table_schema+=g.iloc[i]["Notes"]
+                        table_schema+="""\n::::\n\n"""
+
 
     else:
         table_schema = format_table(
             table[["ColumnName", "ColumnType", "Description"]],
             column_width=column_width,
         )
+
+        if INTERNAL_SPECS:
+            for i in range(len(table)):
+              if table.iloc[i]["Notes"]:
+                 footnote=table.iloc[i]["Notes"].replace("\n", " ")   
+                 table_schema+=f"""\n\n[NOTE ON + {table.iloc[i]["ColumnName"]}]{{.pill}} \n"""
+                 table_schema+=""":::: xfinternalnoteblock\n"""
+                 table_schema+=table.iloc[i]["Notes"]
+                 table_schema+="""\n::::\n\n"""
+
+
 
     reserved_table_schema = ""
     if INTERNAL_SPECS:
