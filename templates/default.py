@@ -165,6 +165,10 @@ A row is uniquely identified by the combination of its primary key : {', '.join(
 }
 
 
+{
+    footnotes
+}
+
 ## Data Types
 
 {
