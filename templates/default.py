@@ -119,7 +119,7 @@ def generate_documentation_for_table(p, table):
                     if g.iloc[i]["Notes"]:
                         #footnote=table.iloc[i]["Notes"].replace("\n", " ")   
                         table_schema+="""\n\n:::: internaldocs\n\n"""
-                        table_schema+=f"""NOTE ON {table.iloc[i]["ColumnName"]} \n\n"""                        
+                        table_schema+=f"""NOTE ON {g.iloc[i]["ColumnName"]} \n\n"""                        
                         table_schema+=g.iloc[i]["Notes"]
                         table_schema+="""\n\n::::\n\n"""
 
@@ -170,6 +170,21 @@ def generate_documentation_for_table(p, table):
 The data is partitioned by {', '.join(['`'+k.strip().strip('`').strip()+'`' for k in p["PartitionnedBy"] ])}. Depending on the technology that you are using to access the data, you 
 will may need to specify which partition you want to access. If you specify a partition to use the columns that are explicitely specified won't be returned in the schema.
 """
+        
+    if INTERNAL_SPECS:
+        if p["FilePathTemplate"]:
+            txt+=textwrap.dedent(
+                f"""
+
+                :::: internaldocs
+
+                The path used to store the files in the S3 bucket should be as follows:
+                {p["FilePathTemplate"]}
+
+                ::::
+
+                """
+            )
 
     txt += f"""
 
