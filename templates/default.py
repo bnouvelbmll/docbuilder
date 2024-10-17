@@ -74,7 +74,7 @@ def generate_documentation_for_table(p, table):
         for i in range(len(table)):
             if table.iloc[i]["Notes"]:
                 table.iloc[i]["Description"]+=f"""[NOTE]{{.pill}} [^col{table.iloc[i]["ColumnName"]}]"""
-                footnotes+="""[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")
+                footnotes+=f"""[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")
 
 
     reserved_table = table.assign(
