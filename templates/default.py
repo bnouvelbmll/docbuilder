@@ -78,7 +78,7 @@ def generate_documentation_for_table(p, table):
                 footnotes+=f"""\n[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")                
             else:
                 ndesc.append(table.iloc[i]["Description"])
-            table["Description"]=pd.Series(ndesc, index=table.index)
+        table["Description"]=pd.Series(ndesc, index=table.index)
 
 
     reserved_table = table.assign(
