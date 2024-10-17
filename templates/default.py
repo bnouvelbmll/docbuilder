@@ -83,7 +83,6 @@ def generate_documentation_for_table(p, table):
     if len(todrop):
         table=table.drop(columns=c)
 
-
     if len(table) > 24 and len(table["Subtable"].unique()) > 1:
         table_schema = "This table is large, for clarity, we split the columns in different groups.\n\n"
         for gn, g in table.groupby("Subtable"):
@@ -319,7 +318,7 @@ This column can take one of the following values:
 
     """
         )
-        txt += format_table(pspecifications.query("~Disabled")[["Case","Specification","Handling"]])
+        txt += format_table(pspecifications[["Case","Specification","Handling"]])
 
         txt += textwrap.dedent("""
 
