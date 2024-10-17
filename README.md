@@ -19,7 +19,7 @@ cd user; git clone git@github.com:bnouvelbmll/docbuilder.git
 # INSTALL PANDOC AND LATEX
 bcdf _system dpkg pandoc
 ln -sf $HOME/local/usr/share/pandoc ~/.pandoc
-echo -e '#!/bin/bash\nLD_LIBRARY_PATH='"$HOME"'/local/usr/lib/x86_64-linux-gnu  '"$HOME"'/local/usr/bin/pandoc  --abbreviations='"$HOME"'/.pandoc/data/abbreviations $*' > ~/bin/pandoc
+echo -e '#!/bin/bash\nPANDOC_DATA_DIR='"$HOME"'/.pandoc/data LD_LIBRARY_PATH='"$HOME"'/local/usr/lib/x86_64-linux-gnu  '"$HOME"'/local/usr/bin/pandoc --data-dir='"$HOME"'/.pandoc/data  --abbreviations='"$HOME"'/.pandoc/data/abbreviations $*' > ~/bin/pandoc
 chmod +x ~/bin/pandoc
 (cd /;tar -xzf ~/organisation/bertrand/tex.tgz )# generated from  https://tug.org/texlive/quickinstall.html
  ln -s ~/local/usr/share/pandoc/ ~/.local/share/
