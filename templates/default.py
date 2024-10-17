@@ -116,12 +116,13 @@ def generate_documentation_for_table(p, table):
             table_schema += "\n\n"
             if INTERNAL_SPECS:
                 for i in range(len(g)):
-                    if g.iloc[i]["Notes"]:
-                        #footnote=table.iloc[i]["Notes"].replace("\n", " ")   
-                        table_schema+="""\n\n:::: internaldocs\n\n"""
-                        table_schema+=f"""NOTE ON {g.iloc[i]["ColumnName"]} \n\n"""                        
-                        table_schema+=g.iloc[i]["Notes"]
-                        table_schema+="""\n\n::::\n\n"""
+                    if "Notes" in g.columns:
+                        if g.iloc[i]["Notes"]:
+                            #footnote=table.iloc[i]["Notes"].replace("\n", " ")   
+                            table_schema+="""\n\n:::: internaldocs\n\n"""
+                            table_schema+=f"""NOTE ON {g.iloc[i]["ColumnName"]} \n\n"""                        
+                            table_schema+=g.iloc[i]["Notes"]
+                            table_schema+="""\n\n::::\n\n"""
 
 
     else:
