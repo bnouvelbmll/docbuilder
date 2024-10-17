@@ -311,18 +311,18 @@ This column can take one of the following values:
     ::: landscape
 
     # Specification
-    
-    The following specifications has been set.
 
     :::: internaldocs
+    
+    The following specifications has been set. The following table is internal.
+     
+    ::::
 
     """
         )
         txt += format_table(pspecifications[["Case","Specification","Handling"]])
 
         txt += textwrap.dedent("""
-
-        ::::
 
         :::
                                
