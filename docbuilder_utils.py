@@ -335,8 +335,9 @@ def process_reference_columns(table_data, columns, refq, tableid=None):
                 colname = solved_tables_schema[tn].index[0]
             print(colname, displayCol)
             try:
-                table_data[i] = table_data[i].astype(int).map(solved_tables_data[th][colname])
-            except:
+                table_data[i] = table_data[i].fillna(-1).astype(int).map(solved_tables_data[th][colname])
+            except Exception as e:
+                print(e)
                 print("Failing to map (already mapped ?): ", colname, displayCol, table_data[i])
                 #table_data[i] = table_data[i].map(solved_tables_data[th][colname])
         else:
