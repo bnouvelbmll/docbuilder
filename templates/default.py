@@ -77,7 +77,7 @@ def generate_documentation_for_table(p, table):
                 # ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [^col{table.iloc[i]["ColumnName"]}]""")
                 # footnotes+=f"""\n[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")   
 
-                footnote=f"""\n[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")   
+                footnote=table.iloc[i]["Notes"].replace("\n", " ")   
                 ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [{footnote}]{{.xfinternalnote}}""")
 
             else:
