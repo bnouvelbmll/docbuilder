@@ -63,11 +63,19 @@ def snake_to_human(s):
 def generate_documentation_for_table(p, table):
     column_width = {"ColumnName": 28, "ColumnType": 14, "Description": 40}
     # math modes in table not supported yet
-
+    table=table.copy()
     product_name=p["Name"]
     pmonitoring = monitoring.query("Dataset == @product_name")
     passertions = assertions.query("Dataset == @product_name")
     pspecifications = specifications.query("Dataset == @product_name")
+    footnotes=""
+
+    if INTERNAL_SPECS:
+        for i in range(len(table)):
+            if table.iloc[i]["Notes"]:
+                table.iloc[i]["Description"]+=f"""[NOTE]{{.pill}} [^col{table.iloc[i]["ColumnName"]}]"""
+                footnotes+="""[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")
+
 
     reserved_table = table.assign(
         ColumnName=lambda x: x["ColumnName"].apply(lambda s: f"`{s}`")
