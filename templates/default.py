@@ -410,4 +410,4 @@ This column can take one of the following values:
 
     txt+="\n"
     txt+=footnotes
-    return etxt
+    return txt
