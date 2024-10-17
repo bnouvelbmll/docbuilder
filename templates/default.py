@@ -13,6 +13,8 @@ print(schema_type_table)
 tsas = get_grist_table("TechnologySubassets")
 monitoring = get_grist_table("MonitoringMetrics")
 assertions = get_grist_table("Assertions")
+specifications = get_grist_table("Specifications")
+
 
 INTERNAL_SPECS = True
 
@@ -65,6 +67,7 @@ def generate_documentation_for_table(p, table):
     product_name=p["Name"]
     pmonitoring = monitoring.query("Dataset == @product_name")
     passertions = assertions.query("Dataset == @product_name")
+    pspecifications = specifications.query("Dataset == @product_name")
 
     reserved_table = table.assign(
         ColumnName=lambda x: x["ColumnName"].apply(lambda s: f"`{s}`")
@@ -72,6 +75,15 @@ def generate_documentation_for_table(p, table):
     table = table.assign(
         ColumnName=lambda x: x["ColumnName"].apply(lambda s: f"`{s}`")
     ).query("~Reserved")
+
+    todrop=[]
+    for c in table.columns:
+        if (table[c].astype(str).map(len)==0).all():
+            todrop.append(c)
+    if len(todrop):
+        table=table.drop(columns=c)
+
+
     if len(table) > 24 and len(table["Subtable"].unique()) > 1:
         table_schema = "This table is large, for clarity, we split the columns in different groups.\n\n"
         for gn, g in table.groupby("Subtable"):
@@ -293,13 +305,37 @@ This column can take one of the following values:
     """
         )
     txt += EXTRA_BLURB
+    if INTERNAL_SPECS and passertions is not None and len(passertions):
+        txt += textwrap.dedent(
+            """
+
+    ::: landscape
+
+    # Specification
+    
+    The following specifications has been set.
+
+    :::: internaldocs
+
+    """
+        )
+        txt += format_table(pspecifications.query("~Disabled")[["Case","Specification","Handling"]])
+
+        txt += textwrap.dedent("""
+
+        ::::
+
+        :::
+                               
+        """
+        )
 
 
     if pmonitoring is not None and len(pmonitoring):
         txt += textwrap.dedent(
             """
             
-    ## Monitoring
+    # Monitoring
 
     ::: internaldocs
 
@@ -316,10 +352,10 @@ This column can take one of the following values:
         """
         )
 
-    if passertions is not None and len(passertions):
+    if INTERNAL_SPECS and passertions is not None and len(passertions):
         txt += textwrap.dedent(
             """
-    ## Data Quality Assertions
+    # Data Quality Assertions
     
     The following assertions are available for this data.
 
@@ -336,10 +372,10 @@ This column can take one of the following values:
         """
         )
 
-    if p["InternalNotes"]:
+    if INTERNAL_SPECS and p["InternalNotes"]:
         txt += textwrap.dedent(
             """
-        ### Internal Notes
+        # Internal Notes
 
         ::: internaldocs
 
