@@ -169,9 +169,6 @@ A row is uniquely identified by the combination of its primary key : {', '.join(
 }
 
 
-{
-    footnotes
-}
 
 ## Data Types
 
@@ -411,4 +408,6 @@ This column can take one of the following values:
     if "ExtraDocs" in p and p["ExtraDocs"]:
         txt += p["ExtraDocs"]
 
-    return txt
+    txt+="\n"
+    txt+=footnotes
+    return etxt
