@@ -74,8 +74,12 @@ def generate_documentation_for_table(p, table):
         ndesc= []
         for i in range(len(table)):
             if table.iloc[i]["Notes"]:
-                ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [^col{table.iloc[i]["ColumnName"]}]""")
-                footnotes+=f"""\n[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")                
+                # ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [^col{table.iloc[i]["ColumnName"]}]""")
+                # footnotes+=f"""\n[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")   
+
+                footnote=f"""\n[^col{table.iloc[i]["ColumnName"]}]: """+table.iloc[i]["Notes"].replace("\n", " ")   
+                ndesc.append(table.iloc[i]["Description"]+f"""[NOTE]{{.pill}} [{footnote}]{{.xfinternalnote}}""")
+
             else:
                 ndesc.append(table.iloc[i]["Description"])
         table["Description"]=pd.Series(ndesc, index=table.index)
