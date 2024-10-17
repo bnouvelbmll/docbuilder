@@ -117,9 +117,9 @@ def generate_documentation_for_table(p, table):
             if INTERNAL_SPECS:
                 for i in range(len(g)):
                     if g.iloc[i]["Notes"]:
-                        footnote=table.iloc[i]["Notes"].replace("\n", " ")   
-                        table_schema+=f"""\n\n[NOTE ON + {g.iloc[i]["ColumnName"]}]{{.pill}} \n\n"""
-                        table_schema+=""":::: xfinternalnoteblock\n\n"""
+                        #footnote=table.iloc[i]["Notes"].replace("\n", " ")   
+                        table_schema+="""\n\n:::: internaldocs\n\n"""
+                        table_schema+=f"""NOTE ON {table.iloc[i]["ColumnName"]} \n\n"""                        
                         table_schema+=g.iloc[i]["Notes"]
                         table_schema+="""\n\n::::\n\n"""
 
@@ -133,9 +133,9 @@ def generate_documentation_for_table(p, table):
         if INTERNAL_SPECS:
             for i in range(len(table)):
               if table.iloc[i]["Notes"]:
-                 footnote=table.iloc[i]["Notes"].replace("\n", " ")   
-                 table_schema+=f"""\n\n[NOTE ON + {table.iloc[i]["ColumnName"]}]{{.pill}} \n\n"""
-                 table_schema+=""":::: xfinternalnoteblock\n\n"""
+                 #footnote=table.iloc[i]["Notes"].replace("\n", " ")   
+                 table_schema+="""\n\n:::: internaldocs\n\n"""
+                 table_schema+=f"""NOTE ON {table.iloc[i]["ColumnName"]} \n\n"""                
                  table_schema+=table.iloc[i]["Notes"]
                  table_schema+="""\n\n::::\n\n"""
 
