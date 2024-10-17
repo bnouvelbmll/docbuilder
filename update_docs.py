@@ -230,7 +230,8 @@ if __name__ == "__main__":
                         "Description",
                         "EnumValues",
                         "Subtable",
-                        "Reserved"
+                        "Reserved",
+                        "Notes"
                     ]
                 ]
                 res["ColumnType"] = (
