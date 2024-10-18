@@ -23,6 +23,8 @@ echo -e '#!/bin/bash\nPANDOC_DATA_DIR='"$HOME"'/.pandoc/data LD_LIBRARY_PATH='"$
 chmod +x ~/bin/pandoc
 (cd /;tar -xzf ~/organisation/bertrand/tex.tgz )# generated from  https://tug.org/texlive/quickinstall.html
  ln -s ~/local/usr/share/pandoc/ ~/.local/share/
+ 
+ [ -d docbuilder ] || cd ..
  ln -s $PWD/docbuilder/template.tex ~/.local/share/pandoc/data/templates/bmll_template.latex
 
 # ENSURE BINARIES AND SCRIPTS ARE IN PATH

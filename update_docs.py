@@ -20,7 +20,7 @@ from templates.default import generate_documentation_for_table
 if not os.path.exists("/usr/share/pandoc/data/templates/bmll_template.latex"):
     if not os.path.exists(os.path.expanduser("~/local/usr/share/pandoc/data/")):
        os.makedirs(os.path.expanduser("~/local/usr/share/pandoc/data/"))
-       shutil("template.tex", "~/local/usr/share/pandoc/data/bmll_template.latex")
+       shutil.copy("template.tex", "~/local/usr/share/pandoc/data/bmll_template.latex")
     os.environ["PANDOC_DATA_DIR"]=os.path.expanduser("~/local/usr/share/pandoc/data/")
 
 
