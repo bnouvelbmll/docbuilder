@@ -22,7 +22,11 @@ def main(date):
 
     
     # run and build tje documentation
-    os.system("python update_docs.py")
+    os.system("INTERNAL_DOCS=0 python update_docs.py")              
     rc=RCloneSyncer(os.path.join(docdir,'render'), "product_team/docs", area="organisation")
+              
+    os.system("INTERNAL_DOCS=1 python update_docs.py")
+    rc=RCloneSyncer(os.path.join(docdir,'render'), "product_team/internal-docs", area="organisation")
+              
     rc.upload()
     

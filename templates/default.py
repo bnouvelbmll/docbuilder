@@ -16,7 +16,7 @@ assertions = get_grist_table("Assertions")
 specifications = get_grist_table("Specifications")
 
 
-INTERNAL_SPECS = True
+INTERNAL_SPECS = int(os.environ.get("INTERNAL_DOCS","0"))>0
 
 EXTRA_BLURB = """
 # Data Quality
