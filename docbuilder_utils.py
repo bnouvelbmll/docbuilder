@@ -366,7 +366,7 @@ def process_reflist_columns(table_data, columns, query, tableid):
                 column_name_to_display = solved_tables_schema[table_name].query("colRef==@display_column").index[0]
             except IndexError:
                 column_name_to_display = solved_tables_schema[table_name].index[0]
-            #print(f"Resolving {table_name}  display_column: {display_column} {column_name} -> mapped via {column_name_to_display} ")                
+            print(f"Resolving {table_name}  display_column: {display_column} {column_name} -> mapped via {column_name_to_display} ")                
             table_data[column_name] = table_data[column_name].apply(
                 lambda cell: (
                     [solved_tables_data[table_hash][column_name_to_display].get(cell_value, f"Not resolved - {cell_value}") for cell_value in cell[1:]]
@@ -387,21 +387,27 @@ def process_choicelist_columns(table_data, columns):
         )
     return table_data
 
+
 def process_date_columns(table_data, columns):
-    lc=None
-    try:
-        date_cols = columns[columns["type"].str.startswith("Date")]
-        for i, c in date_cols.iterrows():
-            lc = c
+    date_cols = columns[columns["type"].str.startswith("Date")]
+    for i, c in date_cols.iterrows():
+        try:
             table_data[i] = pd.to_datetime(table_data[i] * 10**9)
-        fdate_cols = columns[columns["type"].str.startswith("Any")]
-        for i, c in fdate_cols.iterrows():
-            lc = c
-            table_data[i] = table_data[i].map(lambda x:(pd.to_datetime(x[1]* 10**9) if x is not None and isinstance(x, (list, tuple)) and x[0]=='d' else x) )
-    except Exception as e:
-        print("Error whil processing date column",lc,e)
+        except Exception as e :
+            print(table_data[i])
+            print(c, e)
+    fdate_cols = columns[columns["type"].str.startswith("Any")]
+    for i, c in fdate_cols.iterrows():
+        try:
+            table_data[i] = table_data[i].map(lambda x:(pd.to_datetime(x[1]* 10**9) if x is not None and isinstance(x, (list, tuple)) and 
+x[0]=='d' else x) )
+        except Exception as e:
+            print(table_data[i])
+            print(c,e)
 
     return table_data
+
+
 
 def save_to_local_files(docid, tableid, table_data):
     os.makedirs(os.path.join(GRIST_DATA_DIR, f"{docid}"), exist_ok=True)
@@ -446,10 +452,6 @@ def update_grist_table(tableid, dataframe, key_columns, docid=GRIST_DOCID):
         res = requests.put(
             URL, json={"records": records}, headers=HEADERS, verify=False
         )
-        #print(res.status_code)
-        #print(res.text)
-
-        # if res.status_code==400:
 
 
 def format_table(
