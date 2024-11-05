@@ -212,6 +212,10 @@ A row is uniquely identified by the combination of its primary key : {', '.join(
     table_schema
 }
 
+"""
+   
+    if INTERNAL_SPECS:
+      txt += """
 
 ::: internaldocs
 
@@ -221,6 +225,10 @@ A row is uniquely identified by the combination of its primary key : {', '.join(
     reserved_table_schema
 }
 :::
+"""
+
+
+    txt += """
 
 
 ## Data Types

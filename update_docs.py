@@ -246,4 +246,4 @@ if __name__ == "__main__":
                 main_md(p, res, "render/" + tname + "/" + tname)
         except Exception as e:
             print(e)
-            raise
+            #raise
