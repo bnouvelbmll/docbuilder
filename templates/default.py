@@ -19,6 +19,14 @@ specifications = get_grist_table("Specifications")
 
 INTERNAL_SPECS = int(os.environ.get("INTERNAL_DOCS","0"))>0
 
+EXTRA_DQ_POLICIES="""
+- Whenever possible, regressions are run accross datasets to ensure consistency.
+- Every deployment is associated with checks to verify new code is producing consistent data with previous run
+- Data is versionned and you can verify if data has been updated since you last loaded it
+- We have a set of unusual conditions that we check our data for
+- We have general policies and schemas on how we define our schemas
+"""
+
 EXTRA_BLURB = """
 # Data Quality
 

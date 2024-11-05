@@ -43,11 +43,19 @@ bcdf contains the logic for automating running scripts that are in the repo.
 
 It is not yet finalised but ultimately it should be a case of doing:
 ```
-bcdf ./update_docs.py job install 
+bcdf ./cluter_job.py job install 
 ```
+Ultimately this jobs will generate all the documentation and upload it to the product team
+folder - in two formats one for internal consumption (with extra tables and comments) 
+and the public version of the documentation - it may also be used to produce rendered version
+of our schema (that can later be put in a repo - and used as input for iterating on schema
+management - with comments)
 
-To set credentials, you can use the following:
+To set credentials, you may be ablt to use the following:
 ```
 bcdf secrets set BMLL_GTHUB_TOKEN <token>
 bcdf secrets set BMLL_SNOWFLAKE_CREDENTIAL <token>
 ```
+
+This being said for now as secret manager is weak (only crypted in org folder) - I won't put snowflake credential -
+but we will make data query persistent available in cache folders so that the docs can be built based on latest / cache result.
