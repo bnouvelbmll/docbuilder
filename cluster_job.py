@@ -9,7 +9,7 @@ sudo usermod -a -G docker yarn
 """
 
 # Running as yarn
-@schedulable_job(frequency="@weekly", cluster_name="doc-generator", bootstrap=CUSTOM_BOOTSTRAP)
+@schedulable_job(schedule="10 11 ? * MON-FRI *", cluster_name="doc-generator", bootstrap=CUSTOM_BOOTSTRAP, job_queue='doc')
 def main(date):
     import bmll2
     docdir=os.getcwd()
@@ -27,4 +27,5 @@ def main(date):
     os.system("rm -r render;INTERNAL_DOCS=1 python update_docs.py")
     rc=RCloneSyncer(os.path.join(docdir,'render'), "product_team/internal-docs", area="organisation")
     rc.upload()
+
 
